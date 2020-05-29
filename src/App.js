@@ -1,26 +1,49 @@
-import React from 'react';
+import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Button from './components/Button';
+import * as service from './services/posts';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: 0,
+      title: '',
+    };
+  }
+
+  onIncrement = (event) => {
+    this.fetchUserInfo(this.state.id + 1);
+  }
+
+  onDecrement = (event) => {
+    this.fetchUserInfo(this.state.id - 1);
+  }
+
+  fetchUserInfo = async (id) => {
+    const info = await Promise.all([
+      service.getTitle(id),
+      service.getContent(id)
+    ]);
+    
+    this.setState(prevState => ({
+      id: id,
+      title: info[0].data.title,
+      content: info[1].data.content
+    }));
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>{this.state.title}</h1>
+        <p>{this.state.content}</p>
+        <Button onIncrement={this.onIncrement} onDecrement={this.onDecrement} />
+      </div>
+    );
+  }
 }
 
 export default App;
